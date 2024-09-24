@@ -62,7 +62,7 @@ def rankPopulation(paths, distances, bestDistance):
 #parent selection
 def getParents(rankings, totalFitness):
     parentPool = []
-    selectionSize = 3
+    selectionSize = 4
     while len(parentPool) < len(rankings):
         bestParent = (0,0)
         for i in range(selectionSize):
@@ -111,7 +111,7 @@ def getDistances(population):
     return currentBestDistance, currentBestPath, distances
 
 def mutate(population):
-    mutationRate = 0.3
+    mutationRate = 0.2
     length = len(population[0])
     mutatedPopulation = []
     for list in population:
@@ -142,8 +142,8 @@ if __name__ == "__main__":
     population = createInitialPopulation(numCities, cities)   
 
     bestDistance, bestPath, distances = getDistances(population)
-
-    for i in range(10000):
+    iterations = 0
+    for i in range(5000):
         if i % 1000 == 0: print(i)
         rankings, totalFitness = rankPopulation(population, distances, bestDistance)
 
@@ -157,13 +157,19 @@ if __name__ == "__main__":
             children.append(crossover(parent1, parent2))
         population = children
 
-        #population = mutate(population)
+        if iterations >= 100:
+            print("changing it up!")
+            population = mutate(population)
+            iterations = 0
 
         newDistance, newPath, distances = getDistances(population)
 
         if (newDistance < bestDistance):
             bestDistance = newDistance
             bestPath = newPath
+            iterations = 0
+        else:
+            iterations += 1
 
     writeOutput(bestDistance, bestPath)
 
