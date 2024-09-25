@@ -1,7 +1,6 @@
 import math
 import random
 
-#input
 def getInput():
     numCities = 0
     cities = []
@@ -15,7 +14,6 @@ def getInput():
     input.close()
     return numCities, cities
 
-#measure distance
 def findDistance(start, end):
     distance = 0.0
     for i in range(len(start)):
@@ -31,12 +29,11 @@ def findPathDistance(path):
             distance += findDistance(path[i], path[i+1])
     return distance
 
-#create initial pop
 def createInitialPopulation(numCities, cities):
     if numCities <= 5:
         popCount = 50
     else:
-        popCount = 200    
+        popCount = 100    
     population = []
     population.append(cities)
     while len(population) < popCount:
@@ -47,7 +44,6 @@ def createInitialPopulation(numCities, cities):
         population.append(newOrder)
     return population
 
-#order parents
 def rankPopulation(paths, distances, bestDistance):
     rankings = []
     totalFitness = 0
@@ -59,8 +55,7 @@ def rankPopulation(paths, distances, bestDistance):
     return rankings, totalFitness
 
 
-#parent selection
-def getParents(rankings, totalFitness):
+def getParents(rankings):
     parentPool = []
     selectionSize = 4
     while len(parentPool) < len(rankings):
@@ -73,7 +68,6 @@ def getParents(rankings, totalFitness):
     return parentPool
 
 
-#crossover
 def crossover(parent1, parent2):
     start = random.randint(0,(math.floor(len(parent1)/2)))
     end = random.randint(start,len(parent1)-1)
@@ -111,7 +105,7 @@ def getDistances(population):
     return currentBestDistance, currentBestPath, distances
 
 def mutate(population):
-    mutationRate = 0.2
+    mutationRate = 0.02
     length = len(population[0])
     mutatedPopulation = []
     for list in population:
@@ -128,7 +122,6 @@ def mutate(population):
     
     return mutatedPopulation
 
-#output
 def writeOutput(distance, path):
     with open("output.txt", "w") as output:
         output.write(f"{distance:.3f} \n")
@@ -143,13 +136,11 @@ if __name__ == "__main__":
 
     bestDistance, bestPath, distances = getDistances(population)
     iterations = 0
-    for i in range(5000):
-        if i % 1000 == 0: print(i)
+    for i in range(175):
         rankings, totalFitness = rankPopulation(population, distances, bestDistance)
 
-        parents = getParents(rankings, totalFitness)
+        parents = getParents(rankings)
 
-        #breed parents
         children = []
         for j in range(len(parents)):
             parent1 = population[parents[random.randint(0,len(parents)-1)]]
@@ -157,8 +148,7 @@ if __name__ == "__main__":
             children.append(crossover(parent1, parent2))
         population = children
 
-        if iterations >= 100:
-            print("changing it up!")
+        if iterations >= 4:
             population = mutate(population)
             iterations = 0
 
